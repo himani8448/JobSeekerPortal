@@ -207,7 +207,7 @@ async function loadProfile() {
 
     try {
         const response = await fetch(
-            `http://localhost:5000/api/profile/${userId}`
+            `https://jobseekerportal-api.onrender.com/api/profile/${userId}`
         );
 
         const user = await response.json();
@@ -245,7 +245,7 @@ document.getElementById("profileForm").addEventListener("submit", async function
 
     try {
         const response = await fetch(
-            `http://localhost:5000/api/profile/${userId}`,
+            `https://jobseekerportal-api.onrender.com/api/profile/${userId}`,
             {
                 method: "PUT",
                 headers: {
@@ -278,7 +278,7 @@ document.getElementById("profileForm").addEventListener("submit", async function
             formData.append("resume", resumeField.files[0]);
 
             const uploadResponse = await fetch(
-                `http://localhost:5000/api/upload-resume/${userId}`,
+                `https://jobseekerportal-api.onrender.com/api/upload-resume/${userId}`,
                 {
                     method: "POST",
                     body: formData

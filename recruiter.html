@@ -353,8 +353,8 @@
         const password = document.getElementById("recruiterPassword").value;
 
         const url = isSignup
-            ? "http://localhost:5000/api/recruiter/register"
-            : "http://localhost:5000/api/login";
+            ? "https://jobseekerportal-api.onrender.com/api/recruiter/register"
+            : "https://jobseekerportal-api.onrender.com/api/login";
 
         const body = isSignup ? { name, email, password } : { email, password };
         const message = document.getElementById("authMessage");
@@ -465,7 +465,7 @@
 
         try {
             const response = await fetch(
-                `http://localhost:5000/api/recruiter/${recruiterId}/jobs`,
+                `https://jobseekerportal-api.onrender.com/api/recruiter/${recruiterId}/jobs`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -499,7 +499,7 @@
 
         try {
             const response = await fetch(
-                `http://localhost:5000/api/recruiter/${recruiterId}/jobs`
+                `https://jobseekerportal-api.onrender.com/api/recruiter/${recruiterId}/jobs`
             );
 
             const data = await response.json();
@@ -550,7 +550,7 @@
 
         try {
             const response = await fetch(
-                `http://localhost:5000/api/recruiter/${recruiterId}/applicants`
+                `https://jobseekerportal-api.onrender.com/api/recruiter/${recruiterId}/applicants`
             );
 
             const data = await response.json();
@@ -612,7 +612,7 @@ statusOptions.forEach(option => {
 statusSelect.addEventListener("change", async function() {
     try {
         const response = await fetch(
-            `http://localhost:5000/api/recruiter/${recruiterId}/applications/${app._id}/status`,
+            `https://jobseekerportal-api.onrender.com/api/recruiter/${recruiterId}/applications/${app._id}/status`,
             {
                 method: "PUT",
                 headers: {
@@ -644,7 +644,7 @@ statusLabel.appendChild(statusSelect);
 
                 if (app.resume) {
                     const link = document.createElement("a");
-                    link.href = "http://localhost:5000/uploads/" + encodeURIComponent(app.resume);
+                    link.href = "https://jobseekerportal-api.onrender.com/uploads/" + encodeURIComponent(app.resume);
                     link.textContent = "Download Resume";
                     link.target = "_blank";
                     link.rel = "noopener";

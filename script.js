@@ -6,7 +6,7 @@ async function loadRecruiterJobs() {
     const container = document.getElementById("jobContainer");
 
     try {
-        const response = await fetch("http://localhost:5000/api/jobs");
+        const response = await fetch("https://jobseekerportal-api.onrender.com/api/jobs");
 
         if (!response.ok) {
             throw new Error("Unable to fetch jobs");
@@ -197,7 +197,7 @@ async function applyJob(jobTitle, selectedCompany) {
 
         try {
             const response = await fetch(
-                "http://localhost:5000/api/apply",
+                "https://jobseekerportal-api.onrender.com/api/apply",
                 {
                     method: "POST",
                     body: formData
