@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Job Seeker Portal</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f3f5ff;
+            padding: 30px 15px;
+            color: #26304a;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4055c8, #7655d9);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin-bottom: 8px;
+        }
+
+        .profile-card {
+            background: white;
+            padding: 28px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.07);
+        }
+
+        .profile-card h2 {
+            margin-bottom: 22px;
+            color: #4055c8;
+        }
+
+        label {
+            display: block;
+            margin: 17px 0 8px;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #d7dcef;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #5367d5;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .resume-box {
+            margin-top: 22px;
+            padding: 20px;
+            background: #f5f6ff;
+            border: 2px dashed #a5aee8;
+            border-radius: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        button {
+            border: none;
+            padding: 13px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .save-btn {
+            background: #4b5fd0;
+            color: white;
+        }
+
+        .back-btn {
+            background: #e9ebf7;
+            color: #303c73;
+        }
+
+        button:hover {
+            opacity: 0.88;
+        }
+
+        #resumeName {
+            margin-top: 12px;
+            color: #4055c8;
+            font-size: 14px;
+        }
+
+        @media(max-width: 600px) {
+            .profile-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>My Profile</h1>
+        <p>Manage your personal information and resume.</p>
+    </div>
+
+    <div class="profile-card">
+
+        <h2>Personal Information</h2>
+
+        <form id="profileForm">
+
+            <label>Full Name</label>
+            <input type="text" id="name" required>
+
+            <label>Email Address</label>
+            <input type="email" id="email" readonly>
+
+            <label>Phone Number</label>
+            <input type="tel" id="phone" placeholder="Enter phone number">
+
+            <label>Location</label>
+            <input type="text" id="location" placeholder="Enter your location">
+
+            <label>Skills</label>
+            <textarea id="skills" placeholder="HTML, CSS, JavaScript, React"></textarea>
+
+            <div class="resume-box">
+                <h3>Upload Your Resume</h3>
+                <p>PDF or DOCX format (Maximum 5 MB)</p>
+
+                <label for="resume">Choose Resume</label>
+                <input
+                    type="file"
+                    id="resume"
+                    accept=".pdf,.docx"
+                >
+
+                <p id="resumeName">No resume uploaded yet.</p>
+            </div>
+
+            <div class="buttons">
+                <button type="submit" class="save-btn">
+                    Save Changes
+                </button>
+
+                <button
+                    type="button"
+                    class="back-btn"
+                    onclick="window.location.href='dashboard.html'">
+                    Back to Dashboard
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+<script>
+const userId = localStorage.getItem("userId");
+
+const nameField = document.getElementById("name");
+const emailField = document.getElementById("email");
+const phoneField = document.getElementById("phone");
+const locationField = document.getElementById("location");
+const skillsField = document.getElementById("skills");
+const resumeField = document.getElementById("resume");
+const resumeName = document.getElementById("resumeName");
+
+// Load Profile Details
+async function loadProfile() {
+    if (!userId) {
+        alert("Please login first");
+        window.location.href = "login.html";
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `http://localhost:5000/api/profile/${userId}`
+        );
+
+        const user = await response.json();
+
+        if (!response.ok) {
+            alert(user.message || "Unable to load profile");
+            return;
+        }
+
+        nameField.value = user.name || "";
+        emailField.value = user.email || "";
+        phoneField.value = user.phone || "";
+        locationField.value = user.location || "";
+        skillsField.value = (user.skills || []).join(", ");
+
+        if (user.resume) {
+            resumeName.textContent = "Uploaded: " + user.resume;
+        }
+
+    } catch (error) {
+        alert("Unable to connect to server");
+    }
+}
+
+// Show Selected Resume Name
+resumeField.addEventListener("change", function () {
+    if (this.files.length > 0) {
+        resumeName.textContent = this.files[0].name;
+    }
+});
+
+// Save Profile Details
+document.getElementById("profileForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    try {
+        const response = await fetch(
+            `http://localhost:5000/api/profile/${userId}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: nameField.value,
+                    phone: phoneField.value,
+                    location: locationField.value,
+                    skills: skillsField.value
+                        .split(",")
+                        .map(skill => skill.trim())
+                        .filter(skill => skill !== "")
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            alert(data.message || "Profile update failed");
+            return;
+        }
+
+        localStorage.setItem("userName", nameField.value);
+
+        // Upload Resume if Selected
+        if (resumeField.files.length > 0) {
+            const formData = new FormData();
+            formData.append("resume", resumeField.files[0]);
+
+            const uploadResponse = await fetch(
+                `http://localhost:5000/api/upload-resume/${userId}`,
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+            const uploadData = await uploadResponse.json();
+
+            if (!uploadResponse.ok) {
+                alert(uploadData.message || "Resume upload failed");
+                return;
+            }
+        }
+
+        alert("Profile updated successfully!");
+
+        loadProfile();
+
+    } catch (error) {
+        alert("Unable to connect to server");
+    }
+});
+
+loadProfile();
+</script>
+</body>
+</html>

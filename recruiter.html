@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Dashboard | JobSeeker</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6fc;
+            color: #26334d;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 20px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #60a5fa;
+        }
+
+        .header-actions button {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        .main {
+            width: 90%;
+            max-width: 1050px;
+            margin: 35px auto;
+        }
+
+        .welcome {
+            margin-bottom: 25px;
+        }
+
+        .welcome h1 {
+            color: #172554;
+            margin-bottom: 8px;
+        }
+
+        .panel {
+            background: white;
+            padding: 28px;
+            border-radius: 14px;
+            box-shadow: 0 5px 22px rgba(0,0,0,0.06);
+            margin-bottom: 25px;
+        }
+
+        .panel h2 {
+            color: #1e3a8a;
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 17px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #2563eb;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 110px;
+        }
+
+        .primary-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 13px 22px;
+            border-radius: 7px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .primary-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .message {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .auth-panel {
+            max-width: 500px;
+            margin: 45px auto;
+        }
+
+        .auth-panel .field {
+            margin-bottom: 15px;
+        }
+
+        .switch-text {
+            margin-top: 18px;
+            font-size: 14px;
+        }
+
+        .switch-text a {
+            color: #2563eb;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        @media (max-width: 650px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+                grid-column: auto;
+            }
+
+            header {
+                padding: 18px 5%;
+            }
+
+            .panel {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Job<span>Seeker</span> Recruiter</div>
+    <div class="header-actions">
+        <button id="logoutBtn" class="logout-btn hidden" onclick="logoutRecruiter()">
+            Logout
+        </button>
+    </div>
+</header>
+
+<!-- Registration and Login -->
+<section id="authSection" class="panel auth-panel">
+
+    <h2 id="authHeading">Recruiter Login</h2>
+
+    <form id="authForm">
+
+        <div class="field hidden" id="nameField">
+            <label>Recruiter Name</label>
+            <input type="text" id="recruiterName">
+        </div>
+
+        <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="recruiterEmail" required>
+        </div>
+
+        <div class="field">
+            <label>Password</label>
+            <input type="password" id="recruiterPassword" required>
+        </div>
+
+        <button type="submit" class="primary-btn" id="authButton">
+            Login
+        </button>
+
+    </form>
+
+    <p class="message" id="authMessage"></p>
+
+    <p class="switch-text">
+        <span id="switchLabel">Don't have an account?</span>
+        <a onclick="toggleAuth()">Create Account</a>
+    </p>
+
+</section>
+
+<!-- Recruiter Dashboard -->
+<main id="dashboardSection" class="main hidden">
+
+    <div class="welcome">
+        <h1>Welcome, <span id="welcomeName">Recruiter</span>!</h1>
+        <p>Manage your job opportunities from one place.</p>
+    </div>
+
+    <section class="panel">
+        <h2>Post a New Job</h2>
+
+        <form id="jobForm">
+            <div class="form-grid">
+
+                <div class="field">
+                    <label>Job Title *</label>
+                    <input type="text" id="jobTitle" placeholder="e.g. Frontend Developer" required>
+                </div>
+
+                <div class="field">
+                    <label>Company Name *</label>
+                    <input type="text" id="company" placeholder="Company name" required>
+                </div>
+
+                <div class="field">
+                    <label>Job Location *</label>
+                    <input type="text" id="location" placeholder="e.g. Noida" required>
+                </div>
+
+                <div class="field">
+                    <label>Job Type *</label>
+                    <select id="jobType" required>
+                        <option value="">Select Job Type</option>
+                        <option value="Full Time">Full Time</option>
+                        <option value="Part Time">Part Time</option>
+                        <option value="Internship">Internship</option>
+                        <option value="Remote">Remote</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Experience *</label>
+                    <select id="experience" required>
+                        <option value="">Select Experience</option>
+                        <option value="Fresher">Fresher</option>
+                        <option value="1-2 Years">1-2 Years</option>
+                        <option value="2-5 Years">2-5 Years</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Required Skills</label>
+                    <input type="text" id="skills" placeholder="HTML, CSS, JavaScript">
+                </div>
+
+                <div class="field">
+                    <label>Minimum Salary (LPA) *</label>
+                    <input type="number" id="salaryMin" min="0" step="0.1" required>
+                </div>
+
+                <div class="field">
+                    <label>Maximum Salary (LPA) *</label>
+                    <input type="number" id="salaryMax" min="0" step="0.1" required>
+                </div>
+
+                <div class="field full">
+                    <label>Job Description *</label>
+                    <textarea id="description" placeholder="Describe the job responsibilities and requirements..." required></textarea>
+                </div>
+
+            </div>
+
+            <button type="submit" class="primary-btn">Post Job</button>
+        </form>
+
+        <p class="message" id="jobMessage"></p>
+    </section>
+<section class="panel">
+    <h2>My Posted Jobs & Applicants</h2>
+    <div id="myJobsList">Loading your jobs...</div>
+    <p class="message" id="applicantMessage"></p>
+    <div id="applicantsList"></div>
+</section>
+</main>
+
+
+<script>
+    let isSignup = false;
+
+    const authSection = document.getElementById("authSection");
+    const dashboardSection = document.getElementById("dashboardSection");
+
+    function toggleAuth() {
+        isSignup = !isSignup;
+
+        document.getElementById("authHeading").textContent =
+            isSignup ? "Recruiter Registration" : "Recruiter Login";
+
+        document.getElementById("authButton").textContent =
+            isSignup ? "Create Account" : "Login";
+
+        document.getElementById("nameField").classList.toggle("hidden", !isSignup);
+        document.getElementById("recruiterName").required = isSignup;
+
+        document.getElementById("switchLabel").textContent =
+            isSignup ? "Already have an account?" : "Don't have an account?";
+
+        document.querySelector(".switch-text a").textContent =
+            isSignup ? "Login" : "Create Account";
+
+        document.getElementById("authMessage").textContent = "";
+    }
+
+    document.getElementById("authForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const name = document.getElementById("recruiterName").value.trim();
+        const email = document.getElementById("recruiterEmail").value.trim().toLowerCase();
+        const password = document.getElementById("recruiterPassword").value;
+
+        const url = isSignup
+            ? "http://localhost:5000/api/recruiter/register"
+            : "http://localhost:5000/api/login";
+
+        const body = isSignup ? { name, email, password } : { email, password };
+        const message = document.getElementById("authMessage");
+
+        message.textContent = "Please wait...";
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                message.textContent = data.message || "Something went wrong.";
+                return;
+            }
+
+            if (isSignup) {
+                message.textContent = "Registration successful! Please login.";
+                isSignup = false;
+                toggleAuth();
+                return;
+            }
+
+            if (!data.user || data.user.role !== "recruiter") {
+                message.textContent = "This account is not a recruiter account.";
+                return;
+            }
+
+            localStorage.setItem("recruiterId", data.user.id);
+            localStorage.setItem("recruiterName", data.user.name);
+
+            showDashboard();
+
+        } catch (error) {
+            console.error(error);
+            message.textContent = "Server connection failed. Please check your backend.";
+        }
+    });
+
+    function showDashboard() {
+        const recruiterId = localStorage.getItem("recruiterId");
+
+        if (!recruiterId) return;
+
+        authSection.classList.add("hidden");
+        dashboardSection.classList.remove("hidden");
+        document.getElementById("logoutBtn").classList.remove("hidden");
+
+        document.getElementById("welcomeName").textContent =
+            localStorage.getItem("recruiterName") || "Recruiter";
+
+        loadMyJobs();
+    }
+
+    function logoutRecruiter() {
+        localStorage.removeItem("recruiterId");
+        localStorage.removeItem("recruiterName");
+
+        dashboardSection.classList.add("hidden");
+        document.getElementById("logoutBtn").classList.add("hidden");
+        authSection.classList.remove("hidden");
+
+        document.getElementById("authForm").reset();
+        document.getElementById("authMessage").textContent = "";
+    }
+
+    document.getElementById("jobForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const recruiterId = localStorage.getItem("recruiterId");
+
+        if (!recruiterId) {
+            alert("Please login as a recruiter first.");
+            logoutRecruiter();
+            return;
+        }
+
+        const salaryMin = Number(document.getElementById("salaryMin").value);
+        const salaryMax = Number(document.getElementById("salaryMax").value);
+
+        if (salaryMax < salaryMin) {
+            document.getElementById("jobMessage").textContent =
+                "Maximum salary must be greater than or equal to minimum salary.";
+            return;
+        }
+
+        const jobData = {
+            title: document.getElementById("jobTitle").value.trim(),
+            company: document.getElementById("company").value.trim(),
+            location: document.getElementById("location").value.trim(),
+            jobType: document.getElementById("jobType").value,
+            experience: document.getElementById("experience").value,
+            salaryMin,
+            salaryMax,
+            description: document.getElementById("description").value.trim(),
+            skills: document.getElementById("skills").value
+                .split(",")
+                .map(skill => skill.trim())
+                .filter(Boolean)
+        };
+
+        const message = document.getElementById("jobMessage");
+        message.textContent = "Posting job...";
+
+        try {
+            const response = await fetch(
+                `http://localhost:5000/api/recruiter/${recruiterId}/jobs`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(jobData)
+                }
+            );
+
+            const data = await response.json();
+
+            if (response.ok) {
+                message.textContent = "Job posted successfully!";
+                document.getElementById("jobForm").reset();
+                loadMyJobs();
+            } else {
+                message.textContent = data.message || "Unable to post job.";
+            }
+
+        } catch (error) {
+            console.error(error);
+            message.textContent = "Server connection failed. Please try again.";
+        }
+    });
+
+    async function loadMyJobs() {
+        const recruiterId = localStorage.getItem("recruiterId");
+        const jobsList = document.getElementById("myJobsList");
+
+        if (!recruiterId || !jobsList) return;
+
+        jobsList.textContent = "Loading your jobs...";
+
+        try {
+            const response = await fetch(
+                `http://localhost:5000/api/recruiter/${recruiterId}/jobs`
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Unable to load jobs.");
+            }
+
+            const jobs = Array.isArray(data) ? data : (data.jobs || []);
+            jobsList.innerHTML = "";
+
+            if (jobs.length === 0) {
+                jobsList.textContent = "You have not posted any jobs yet.";
+                return;
+            }
+
+            jobs.forEach(job => {
+                const card = document.createElement("div");
+                card.style.cssText =
+                    "background:#f1f5ff;padding:18px;border-radius:10px;margin:12px 0;";
+
+                const heading = document.createElement("h3");
+                heading.textContent = job.title + " - " + job.company;
+
+                const button = document.createElement("button");
+                button.textContent = "View Applicants";
+                button.className = "primary-btn";
+                button.addEventListener("click", () => loadApplicants(job._id));
+
+                card.append(heading, button);
+                jobsList.appendChild(card);
+            });
+
+        } catch (error) {
+            jobsList.textContent = error.message;
+        }
+    }
+
+    async function loadApplicants(jobId) {
+        const recruiterId = localStorage.getItem("recruiterId");
+        const container = document.getElementById("applicantsList");
+        const message = document.getElementById("applicantMessage");
+
+        if (!container || !message) return;
+
+        container.innerHTML = "";
+        message.textContent = "Loading applicants...";
+
+        try {
+            const response = await fetch(
+                `http://localhost:5000/api/recruiter/${recruiterId}/applicants`
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Unable to load applicants.");
+            }
+
+            const applicants = Array.isArray(data)
+                ? data
+                : (data.applicants || data.applications || []);
+
+            const filtered = applicants.filter(app =>
+                String(app.jobId?._id || app.jobId || "") === String(jobId)
+            );
+
+            message.textContent = "";
+
+            if (filtered.length === 0) {
+                message.textContent = "No applicants found for this job yet.";
+                return;
+            }
+
+            filtered.forEach(app => {
+                const card = document.createElement("div");
+                card.style.cssText =
+                    "background:#f8fafc;border:1px solid #dbeafe;padding:18px;border-radius:10px;margin:12px 0;";
+
+                const details = document.createElement("p");
+                details.style.lineHeight = "1.8";
+                details.textContent =
+                    `Name: ${app.candidateName || "N/A"} | Email: ${app.email || "N/A"} | Phone: ${app.phone || "N/A"} | Location: ${app.location || "N/A"} | Skills: ${(app.skills || []).join(", ")}`;
+
+               const statusLabel = document.createElement("p");
+statusLabel.textContent = "Application Status: ";
+
+const statusSelect = document.createElement("select");
+
+const statusOptions = [
+    "Applied",
+    "Shortlisted",
+    "Rejected",
+    "Interview Scheduled",
+    "Selected"
+];
+
+statusOptions.forEach(option => {
+    const item = document.createElement("option");
+    item.value = option;
+    item.textContent = option;
+
+    if (option === (app.status || "Applied")) {
+        item.selected = true;
+    }
+
+    statusSelect.appendChild(item);
+});
+
+statusSelect.addEventListener("change", async function() {
+    try {
+        const response = await fetch(
+            `http://localhost:5000/api/recruiter/${recruiterId}/applications/${app._id}/status`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ status: statusSelect.value })
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            alert(result.message || "Status update failed");
+            statusSelect.value = app.status || "Applied";
+            return;
+        }
+
+        app.status = result.status;
+        alert("Application status updated successfully!");
+
+    } catch (error) {
+        alert("Server connection failed.");
+        statusSelect.value = app.status || "Applied";
+    }
+});
+
+statusLabel.appendChild(statusSelect);
+                card.append(details, statusLabel);
+
+                if (app.resume) {
+                    const link = document.createElement("a");
+                    link.href = "http://localhost:5000/uploads/" + encodeURIComponent(app.resume);
+                    link.textContent = "Download Resume";
+                    link.target = "_blank";
+                    link.rel = "noopener";
+                    card.appendChild(link);
+                }
+
+                container.appendChild(card);
+            });
+
+        } catch (error) {
+            message.textContent = error.message;
+        }
+    }
+
+    // Restore recruiter dashboard after page refresh
+    showDashboard();
+</script>
+</body>
+</html>

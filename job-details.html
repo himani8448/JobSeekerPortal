@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Details | JobSeeker</title>
+<style>
+*{box-sizing:border-box;font-family:Arial,sans-serif}
+body{margin:0;background:#f4f6fc;color:#26334d}
+header{background:#172554;color:white;padding:20px 7%}
+header a{color:white;text-decoration:none;font-size:23px;font-weight:bold}
+header span{color:#60a5fa}
+.container{max-width:850px;width:90%;margin:40px auto}
+.job-box,.apply-box{background:white;padding:30px;border-radius:14px;box-shadow:0 5px 22px #0000000d;margin-bottom:25px}
+h1,h2{color:#1e3a8a;margin-top:0}
+.company{color:#64748b;font-size:18px}
+.details{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin:25px 0}
+.item{background:#f1f5ff;padding:15px;border-radius:8px}
+.item strong{display:block;margin-bottom:6px;color:#1e3a8a}
+.description{line-height:1.7;white-space:pre-wrap}
+button{background:#2563eb;color:white;border:0;border-radius:7px;padding:13px 22px;cursor:pointer;font-weight:bold;margin-top:15px}
+button:hover{background:#1d4ed8}
+form{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.full{grid-column:1/-1}
+label{font-weight:bold;color:#334155}
+input,textarea{padding:12px;border:1px solid #cbd5e1;border-radius:7px;font-size:15px;width:100%}
+textarea{min-height:90px;resize:vertical}
+#message{margin-top:15px;font-weight:bold}
+.hidden{display:none}
+@media(max-width:600px){.details,form{grid-template-columns:1fr}.field.full{grid-column:auto}.job-box,.apply-box{padding:20px}}
+</style>
+</head>
+<body>
+
+<header>
+<a href="index.html">Job<span>Seeker</span></a>
+</header>
+
+<main class="container">
+<section class="job-box">
+<h1 id="title">Loading job...</h1>
+<p class="company" id="company"></p>
+
+<div class="details">
+<div class="item"><strong>Location</strong><span id="location"></span></div>
+<div class="item"><strong>Salary</strong><span id="salary"></span></div>
+<div class="item"><strong>Job Type</strong><span id="jobType"></span></div>
+<div class="item"><strong>Experience</strong><span id="experience"></span></div>
+<div class="item"><strong>Skills</strong><span id="skills"></span></div>
+</div>
+
+<h2>Job Description</h2>
+<p class="description" id="description"></p>
+<button id="applyButton">Apply Now</button>
+<p id="message"></p>
+</section>
+
+<section class="apply-box hidden" id="applySection">
+<h2>Job Application Form</h2>
+<p>Please check your details before submitting.</p>
+
+<form id="applicationForm">
+<div class="field">
+<label for="candidateName">Full Name *</label>
+<input id="candidateName" required>
+</div>
+
+<div class="field">
+<label for="email">Email *</label>
+<input id="email" type="email" required>
+</div>
+
+<div class="field">
+<label for="phone">Phone Number *</label>
+<input id="phone" type="tel" required pattern="[0-9]{10}" maxlength="10">
+</div>
+
+<div class="field">
+<label for="candidateLocation">Location</label>
+<input id="candidateLocation">
+</div>
+
+<div class="field full">
+<label for="candidateSkills">Skills (comma separated)</label>
+<textarea id="candidateSkills" placeholder="HTML, CSS, JavaScript, React"></textarea>
+</div>
+
+<div class="field full">
+<label for="resume">Upload Resume (PDF/DOCX, max 5 MB) *</label>
+<input id="resume" type="file" accept=".pdf,.docx" required>
+</div>
+
+<div class="field full">
+<button type="submit" id="submitButton">Submit Application</button>
+</div>
+</form>
+</section>
+</main>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const jobId = params.get("id");
+let currentJob = {};
+
+function showJob(job) {
+    currentJob = job;
+    document.getElementById("title").textContent = job.title || "Job Details";
+    document.getElementById("company").textContent = job.company || "";
+    document.getElementById("location").textContent = job.location || "Not specified";
+    document.getElementById("salary").textContent =
+        job.salary || (job.salaryMin !== undefined
+        ? `₹${job.salaryMin} - ${job.salaryMax} LPA`
+        : "Not specified");
+    document.getElementById("jobType").textContent = job.jobType || "Not specified";
+    document.getElementById("experience").textContent = job.experience || "Not specified";
+    document.getElementById("skills").textContent =
+        Array.isArray(job.skills) ? job.skills.join(", ") : (job.skills || "Not specified");
+    document.getElementById("description").textContent =
+        job.description || "No description provided.";
+}
+
+async function loadJob() {
+    if (!jobId) {
+        showJob({
+            title: params.get("title"),
+            company: params.get("company"),
+            location: params.get("location"),
+            salary: params.get("salary"),
+            jobType: params.get("jobType"),
+            experience: params.get("experience"),
+            skills: params.get("skills"),
+            description: "Please contact the company for further job details."
+        });
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `http://localhost:5000/api/jobs/${encodeURIComponent(jobId)}`
+        );
+        const job = await response.json();
+        if (!response.ok) throw new Error(job.message || "Job not found");
+        showJob(job);
+    } catch (error) {
+        document.getElementById("title").textContent = "Unable to load job";
+        document.getElementById("message").textContent = error.message;
+    }
+}
+
+document.getElementById("applyButton").addEventListener("click", async () => {
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) {
+        alert("Please login first to apply for a job.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    document.getElementById("applySection").classList.remove("hidden");
+    document.getElementById("applySection").scrollIntoView({behavior:"smooth"});
+
+    try {
+        const response = await fetch(`http://localhost:5000/api/profile/${userId}`);
+        if (response.ok) {
+            const data = await response.json();
+            const user = data.user || data;
+
+            document.getElementById("candidateName").value = user.name || "";
+            document.getElementById("email").value = user.email || "";
+            document.getElementById("phone").value = user.phone || "";
+            document.getElementById("candidateLocation").value = user.location || "";
+            document.getElementById("candidateSkills").value =
+                Array.isArray(user.skills) ? user.skills.join(", ") : (user.skills || "");
+        }
+    } catch (error) {
+        console.log("Profile details could not be loaded:", error);
+    }
+});
+
+document.getElementById("applicationForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const userId = localStorage.getItem("userId");
+    const file = document.getElementById("resume").files[0];
+    const message = document.getElementById("message");
+    const submitButton = document.getElementById("submitButton");
+
+    if (!userId) {
+        alert("Please login first.");
+        return;
+    }
+
+    if (!file) {
+        alert("Please upload your resume.");
+        return;
+    }
+
+    const allowedTypes = [
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+        alert("Please upload only PDF or DOCX files.");
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        alert("Resume must be smaller than 5 MB.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("userId", userId);
+    formData.append("jobId", jobId || "");
+    formData.append("jobTitle", currentJob.title || "");
+    formData.append("company", currentJob.company || "");
+    formData.append("candidateName", document.getElementById("candidateName").value.trim());
+    formData.append("email", document.getElementById("email").value.trim());
+    formData.append("phone", document.getElementById("phone").value.trim());
+    formData.append("location", document.getElementById("candidateLocation").value.trim());
+    formData.append("skills", document.getElementById("candidateSkills").value);
+    formData.append("resume", file);
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Submitting...";
+
+    try {
+        const response = await fetch("http://localhost:5000/api/apply", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) throw new Error(data.message || "Application failed.");
+
+        message.textContent = "Application submitted successfully!";
+        message.style.color = "green";
+        document.getElementById("applicationForm").reset();
+        document.getElementById("applySection").classList.add("hidden");
+    } catch (error) {
+        message.textContent = error.message || "Server connection failed.";
+        message.style.color = "red";
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit Application";
+    }
+});
+
+loadJob();
+</script>
+</body>
+</html>

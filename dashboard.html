@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | JobSeeker</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6ff;
+            color: #252b45;
+        }
+
+        header {
+            background: white;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 12px #00000010;
+        }
+
+        header h2 {
+            color: #5546d8;
+        }
+
+        .logout {
+            background: #5546d8;
+            color: white;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+
+        .welcome {
+            background: linear-gradient(120deg, #5145cd, #8065ed);
+            color: white;
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+
+        .welcome h1 {
+            margin-bottom: 12px;
+        }
+
+        .welcome p {
+            line-height: 1.6;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 22px;
+        }
+
+        .card {
+            background: white;
+            padding: 28px;
+            border-radius: 14px;
+            box-shadow: 0 5px 20px #00000008;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px #5546d822;
+        }
+
+        .card h3 {
+            color: #5546d8;
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .card button {
+            margin-top: 18px;
+            padding: 10px 16px;
+            background: #5546d8;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        #applicationsSection {
+            display: none;
+            margin-top: 35px;
+        }
+
+        #applicationsSection h2 {
+            color: #5546d8;
+            margin-bottom: 20px;
+        }
+
+        .application-card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 20px #00000008;
+        }
+
+        .application-card h3 {
+            color: #5546d8;
+            margin-bottom: 10px;
+        }
+
+        .application-card p {
+            margin: 8px 0;
+            color: #555;
+        }
+
+        .status {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        @media(max-width: 600px) {
+            .welcome {
+                padding: 25px;
+            }
+
+            header {
+                padding: 16px 5%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>JobSeeker</h2>
+    <button class="logout" onclick="logout()">Logout</button>
+</header>
+
+<div class="container">
+
+    <section class="welcome">
+        <h1 id="welcomeName">Welcome!</h1>
+        <p>
+            Welcome to your Job Seeker Dashboard.
+            Explore job opportunities and manage your career.
+        </p>
+    </section>
+
+    <div class="cards">
+
+        <div class="card">
+    <h3>👤 My Profile</h3>
+    <p>View and manage your personal profile.</p>
+    <button onclick="window.location.href='profile.html'">
+        View Profile
+    </button>
+    </div>
+
+        <div class="card">
+            <h3>💼 Find Jobs</h3>
+            <p>Explore available jobs and find opportunities.</p>
+            <button onclick="window.location.href='index.html'">
+                Explore Jobs
+            </button>
+        </div>
+
+        <div class="card">
+            <h3>📄 My Applications</h3>
+            <p>Manage and track your job applications.</p>
+            <button onclick="loadApplications()">
+                View Applications
+            </button>
+        </div>
+
+    </div>
+
+    <section id="applicationsSection">
+        <h2>My Job Applications</h2>
+        <div id="applicationsList"></div>
+    </section>
+
+</div>
+
+<script>
+    const userName = localStorage.getItem("userName");
+
+    document.getElementById("welcomeName").innerText =
+        userName ? "Welcome, " + userName + "!" : "Welcome to JobSeeker!";
+
+    async function loadApplications() {
+        const userId = localStorage.getItem("userId");
+
+        if (!userId) {
+            alert("Please login first!");
+            window.location.href = "login.html";
+            return;
+        }
+
+        const section = document.getElementById("applicationsSection");
+        const list = document.getElementById("applicationsList");
+
+        section.style.display = "block";
+        list.innerHTML = "<p>Loading your applications...</p>";
+
+        try {
+            const response = await fetch(
+                "http://localhost:5000/api/applications/" + userId
+            );
+
+            const applications = await response.json();
+
+            if (!response.ok) {
+                throw new Error(applications.message || "Unable to load applications");
+            }
+
+            if (applications.length === 0) {
+                list.innerHTML = "<p>You have not applied for any jobs yet.</p>";
+                return;
+            }
+
+            list.innerHTML = "";
+
+            applications.forEach((application) => {
+                const card = document.createElement("div");
+                card.className = "application-card";
+
+                const title = document.createElement("h3");
+                title.textContent = application.jobTitle;
+
+                const company = document.createElement("p");
+                company.textContent = "Company: " + application.company;
+
+                const status = document.createElement("span");
+                status.className = "status";
+                status.textContent = "Status: " + application.status;
+
+                card.appendChild(title);
+                card.appendChild(company);
+                card.appendChild(status);
+
+                list.appendChild(card);
+            });
+
+        } catch (error) {
+            console.error("Applications Error:", error);
+            list.innerHTML = "<p>Unable to load applications. Please try again.</p>";
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem("userName");
+        localStorage.removeItem("userId");
+        window.location.href = "login.html";
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Seeker Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo">Job<span>Seeker</span></div>
+
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#jobs">Find Jobs</a>
+            <a href="#about">About</a>
+        </nav>
+
+        <div class="buttons">
+            <a href="login.html">
+    <button class="login-btn">Login</button>
+</a>
+           <a href="login.html">
+    <button class="signup-btn">Sign Up</button>
+</a>
+<a href="recruiter.html" class="btn">Recruiter</a>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <h1>Find Your <span>Dream Job</span></h1>
+
+        <p>
+            Discover thousands of job opportunities
+            and take the next step in your career.
+        </p>
+
+        <div class="search-box">
+    <input type="text" id="searchInput"
+           placeholder="Job title or keyword">
+
+    <input type="text" id="locationInput"
+           placeholder="Location">
+
+    <select id="jobType">
+        <option value="">All Job Types</option>
+        <option value="Full Time">Full Time</option>
+        <option value="Part Time">Part Time</option>
+        <option value="Internship">Internship</option>
+        <option value="Remote">Remote</option>
+    </select>
+
+    <select id="experience">
+        <option value="">All Experience</option>
+        <option value="Fresher">Fresher</option>
+        <option value="1-2 Years">1-2 Years</option>
+        <option value="2-5 Years">2-5 Years</option>
+    </select>
+
+    <select id="salary">
+        <option value="">Any Salary</option>
+        <option value="0-3">₹0-3 LPA</option>
+        <option value="3-5">₹3-5 LPA</option>
+        <option value="5-8">₹5-8 LPA</option>
+        <option value="8+">₹8+ LPA</option>
+    </select>
+
+    <button onclick="searchJobs()">Search Jobs</button>
+</div>
+    
+    </section>
+
+    <section class="jobs-section" id="jobs">
+        <h2>Latest Job Opportunities</h2>
+
+       <div class="job-container" id="jobContainer">
+
+    <div class="job-card">
+        <h3>Frontend Developer</h3>
+        <p>ABC Technologies</p>
+        <p>Location: Noida</p>
+        <p>Job Type: Full Time</p>
+        <p>Experience: Fresher</p>
+        <p>Salary: ₹3 - 5 LPA</p>
+        <button onclick="applyJob('Frontend Developer')">
+            Apply Now
+        </button>
+    </div>
+
+    <div class="job-card">
+        <h3>Web Developer</h3>
+        <p>XYZ Solutions</p>
+        <p>Location: Delhi</p>
+        <p>Job Type: Internship</p>
+        <p>Experience: Fresher</p>
+        <p>Salary: ₹4 - 6 LPA</p>
+        <button onclick="applyJob('Web Developer')">
+            Apply Now
+        </button>
+    </div>
+
+    <div class="job-card">
+        <h3>Software Engineer</h3>
+        <p>Tech Company</p>
+        <p>Location: Gurgaon</p>
+        <p>Job Type: Full Time</p>
+        <p>Experience: 2-5 Years</p>
+        <p>Salary: ₹5 - 8 LPA</p>
+        <button onclick="applyJob('Software Engineer')">
+            Apply Now
+        </button>
+    </div>
+
+</div>
+    </section>
+
+    <section class="about" id="about">
+        <h2>About JobSeeker</h2>
+        <p>
+            JobSeeker is a platform that helps job seekers
+            find suitable job opportunities and build their careers.
+        </p>
+    </section>
+
+    <footer>
+        <p>© 2026 JobSeeker Portal | All Rights Reserved</p>
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
